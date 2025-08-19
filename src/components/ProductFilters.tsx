@@ -1,15 +1,22 @@
 import { categories, products, suppliers } from '../data/products'
 import './ProductFilters.css'
 
+interface PriceRange {
+  min: number
+  max: number
+}
+
 interface ProductFiltersProps {
   selectedCategory: string
   selectedSupplier: string
   searchQuery: string
   sortBy: string
+  priceRange: PriceRange
   onCategoryChange: (category: string) => void
   onSupplierChange: (supplier: string) => void
   onSearchChange: (search: string) => void
   onSortChange: (sort: string) => void
+  onPriceRangeChange: (range: PriceRange) => void
 }
 
 const ProductFilters = ({
@@ -20,7 +27,9 @@ const ProductFilters = ({
   onCategoryChange,
   onSupplierChange,
   onSearchChange,
-  onSortChange
+  onSortChange,
+  priceRange,
+  onPriceRangeChange
 }: ProductFiltersProps) => {
 
   // Calculate product count per supplier
@@ -28,6 +37,15 @@ const ProductFilters = ({
     ...supplier,
     products: products.filter(p => p.supplier === supplier.id).length
   }))
+
+  // Get min and max prices from all products
+  const allPrices = products.map(p => p.basePrice)
+  const minProductPrice = Math.min(...allPrices)
+  const maxProductPrice = Math.max(...allPrices)
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
+  }
 
   return (
     <div className="product-filters">
@@ -101,6 +119,26 @@ const ProductFilters = ({
                 <span className="supplier-count l1">({supplier.products})</span>
               </button>
             ))}
+          </div>
+          <div className="filter-section">
+            <h3 className="filter-title p1-medium">Rango de precios</h3>
+            <div className="price-range-slider">
+              <input
+                type="range"
+                min={minProductPrice}
+                max={maxProductPrice}
+                value={priceRange.max}
+                onChange={(e) =>
+                  onPriceRangeChange({ ...priceRange, max: Number(e.target.value) })
+                }
+                className="range-slider single-slider"
+              />
+              <div className="price-values">
+                <span>
+                  Desde {formatPrice(minProductPrice)} hasta {formatPrice(priceRange.max)}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
