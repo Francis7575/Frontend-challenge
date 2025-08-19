@@ -4,6 +4,7 @@ import { products } from '../data/products'
 import { Product } from '../types/Product'
 import PricingCalculator from '../components/PricingCalculator'
 import './ProductDetail.css'
+import { useCart } from '../context/CartContext'
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>()
@@ -11,12 +12,13 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [quantity, setQuantity] = useState<number>(1)
+  const { addToCart } = useCart()
 
   useEffect(() => {
     if (id) {
       const foundProduct = products.find(p => p.id === parseInt(id))
       setProduct(foundProduct || null)
-      
+
       // Set default selections
       if (foundProduct?.colors && foundProduct.colors.length > 0) {
         setSelectedColor(foundProduct.colors[0])
@@ -65,7 +67,7 @@ const ProductDetail = () => {
                 <span className="material-icons">image</span>
               </div>
             </div>
-            
+
             {/* Bug: thumbnails don't work */}
             <div className="image-thumbnails">
               {[1, 2, 3].map(i => (
@@ -81,7 +83,7 @@ const ProductDetail = () => {
             <div className="product-header">
               <h1 className="product-title h2">{product.name}</h1>
               <p className="product-sku p1">SKU: {product.sku}</p>
-              
+
               {/* Status */}
               <div className="product-status">
                 {product.status === 'active' ? (
@@ -159,20 +161,20 @@ const ProductDetail = () => {
               <div className="quantity-selector">
                 <label className="quantity-label l1">Cantidad:</label>
                 <div className="quantity-controls">
-                  <button 
+                  <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="quantity-btn"
                   >
                     <span className="material-icons">remove</span>
                   </button>
-                  <input 
-                    type="number" 
-                    value={quantity} 
+                  <input
+                    type="number"
+                    value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                     className="quantity-input"
                     min="1"
                   />
-                  <button 
+                  <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="quantity-btn"
                   >
@@ -182,16 +184,17 @@ const ProductDetail = () => {
               </div>
 
               <div className="action-buttons">
-                <button 
+                <button
                   className={`btn btn-primary cta1 ${!canAddToCart ? 'disabled' : ''}`}
                   disabled={!canAddToCart}
-                  onClick={() => alert('Función de agregar al carrito por implementar')}
+                  onClick={() =>
+                    addToCart(product, quantity, selectedColor, selectedSize)}
                 >
                   <span className="material-icons">shopping_cart</span>
                   {canAddToCart ? 'Agregar al carrito' : 'No disponible'}
                 </button>
-                
-                <button 
+
+                <button
                   className="btn btn-secondary cta1"
                   onClick={() => alert('Función de cotización por implementar')}
                 >
@@ -208,7 +211,7 @@ const ProductDetail = () => {
           <PricingCalculator product={product} />
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
