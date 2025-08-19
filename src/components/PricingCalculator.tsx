@@ -16,29 +16,31 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
       return product.basePrice * qty
     }
 
-    // Find applicable price break
-    let applicableBreak = product.priceBreaks[0]
-    for (let i = 0; i < product.priceBreaks.length; i++) {
-      if (qty >= product.priceBreaks[i].minQty) {
-        applicableBreak = product.priceBreaks[i]
-      }
+    const sortedBreaks = [...product.priceBreaks].sort((a, b) => a.minQty - b.minQty)
+
+    const applicableBreaks = sortedBreaks.filter(b => qty >= b.minQty)
+
+    if (applicableBreaks.length === 0) {
+      return product.basePrice * qty
     }
 
-    return applicableBreak.price * qty
+    const bestBreak = applicableBreaks.reduce((best, current) =>
+      current.price < best.price ? current : best
+    )
+
+    return bestBreak.price * qty
   }
 
   // Calculate discount amount
   const getDiscount = (qty: number) => {
-    if (!product.priceBreaks || product.priceBreaks.length === 0) {
-      return 0
-    }
+    const totalBase = product.basePrice * qty
+    const totalDiscounted = calculatePrice(qty)
 
-    const baseTotal = product.basePrice * qty
-    const discountedTotal = calculatePrice(qty)
+    if (totalBase === 0) return 0
 
-    // Calculate savings percentage
-    return ((baseTotal - discountedTotal) / baseTotal) * 100
+    return ((totalBase - totalDiscounted) / totalBase) * 100
   }
+
 
   // Format price display
   const formatPrice = (price: number) => {
@@ -46,8 +48,8 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
   }
 
   const currentPrice = Math.round(calculatePrice(quantity))
-
   const discountPercent = getDiscount(quantity)
+  const MAX_QUANTITY = 10000;
 
   return (
     <div className="pricing-calculator">
@@ -66,10 +68,13 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
             <input
               type="number"
               value={quantity}
-              onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              onChange={(e) => {
+                const value = parseInt(e.target.value) || 1;
+                setQuantity(Math.min(Math.max(1, value), MAX_QUANTITY));
+              }}
               className="quantity-input p1"
               min="1"
-              max="10000"
+              max={MAX_QUANTITY}
             />
             <span className="quantity-unit l1">unidades</span>
           </div>
