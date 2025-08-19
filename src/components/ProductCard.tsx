@@ -15,16 +15,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
       case 'inactive':
         return <span className="status-badge status-inactive l1">No disponible</span>
       case 'pending':
-        // Handle pending status
-        return <span className="status-badge status-active l1">Disponible</span>
+        return <span className="status-badge status-pending l1">Pendiente</span>
       default:
         return null
     }
   }
 
   // Format price for display
-  const formatPrice = (price: number) => {
-    return `$${price.toLocaleString()}` // Missing currency and proper formatting
+   const formatPrice = (price: number) => {
+    return price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
   }
 
   // Check stock availability

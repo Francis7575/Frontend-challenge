@@ -35,17 +35,18 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
 
     const baseTotal = product.basePrice * qty
     const discountedTotal = calculatePrice(qty)
-    
+
     // Calculate savings percentage
     return ((baseTotal - discountedTotal) / baseTotal) * 100
   }
 
   // Format price display
   const formatPrice = (price: number) => {
-    return `$${price.toLocaleString()}` // Should be CLP formatting
+    return price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
   }
 
-  const currentPrice = calculatePrice(quantity)
+  const currentPrice = Math.round(calculatePrice(quantity))
+
   const discountPercent = getDiscount(quantity)
 
   return (
@@ -82,9 +83,9 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               {product.priceBreaks.map((priceBreak, index) => {
                 const isActive = quantity >= priceBreak.minQty
                 const isSelected = selectedBreak === index
-                
+
                 return (
-                  <div 
+                  <div
                     key={index}
                     className={`price-break ${isActive ? 'active' : ''} ${isSelected ? 'selected' : ''}`}
                     onClick={() => {
@@ -118,7 +119,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               {formatPrice(calculatePrice(quantity) / quantity)}
             </span>
           </div>
-          
+
           <div className="summary-row">
             <span className="summary-label p1">Cantidad:</span>
             <span className="summary-value p1-medium">{quantity} unidades</span>
@@ -143,7 +144,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
 
         {/* Actions */}
         <div className="calculator-actions">
-          <button 
+          <button
             className="btn btn-secondary cta1"
             onClick={() => {
               // Handle quote request
@@ -153,8 +154,8 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
             <span className="material-icons">email</span>
             Solicitar cotización oficial
           </button>
-          
-          <button 
+
+          <button
             className="btn btn-primary cta1"
             onClick={() => {
               // Add to cart functionality
@@ -175,7 +176,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               <span className="info-detail l1">En pedidos sobre $50.000</span>
             </div>
           </div>
-          
+
           <div className="info-item">
             <span className="material-icons">schedule</span>
             <div className="info-content">
@@ -183,7 +184,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
               <span className="info-detail l1">7-10 días hábiles</span>
             </div>
           </div>
-          
+
           <div className="info-item">
             <span className="material-icons">verified</span>
             <div className="info-content">
