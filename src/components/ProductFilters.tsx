@@ -1,11 +1,13 @@
-import { categories, suppliers } from '../data/products'
+import { categories, products, suppliers } from '../data/products'
 import './ProductFilters.css'
 
 interface ProductFiltersProps {
   selectedCategory: string
+  selectedSupplier: string
   searchQuery: string
   sortBy: string
   onCategoryChange: (category: string) => void
+  onSupplierChange: (supplier: string) => void
   onSearchChange: (search: string) => void
   onSortChange: (sort: string) => void
 }
@@ -13,11 +15,20 @@ interface ProductFiltersProps {
 const ProductFilters = ({
   selectedCategory,
   searchQuery,
+  selectedSupplier,
   sortBy,
   onCategoryChange,
+  onSupplierChange,
   onSearchChange,
   onSortChange
 }: ProductFiltersProps) => {
+
+  // Calculate product count per supplier
+  const suppliersWithCounts = suppliers.map(supplier => ({
+    ...supplier,
+    products: products.filter(p => p.supplier === supplier.id).length
+  }))
+
   return (
     <div className="product-filters">
       <div className="filters-card">
@@ -80,11 +91,15 @@ const ProductFilters = ({
         <div className="filter-section">
           <h3 className="filter-title p1-medium">Proveedores</h3>
           <div className="supplier-list">
-            {suppliers.map(supplier => (
-              <div key={supplier.id} className="supplier-item">
+            {suppliersWithCounts.map(supplier => (
+              <button
+                key={supplier.id}
+                className={`supplier-item ${selectedSupplier === supplier.id ? 'active' : ''}`}
+                onClick={() => onSupplierChange(supplier.id)}
+              >
                 <span className="supplier-name l1">{supplier.name}</span>
-                <span className="supplier-count l1">{supplier.products}</span>
-              </div>
+                <span className="supplier-count l1">({supplier.products})</span>
+              </button>
             ))}
           </div>
         </div>
