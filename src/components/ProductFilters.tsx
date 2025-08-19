@@ -17,6 +17,7 @@ interface ProductFiltersProps {
   onSearchChange: (search: string) => void
   onSortChange: (sort: string) => void
   onPriceRangeChange: (range: PriceRange) => void
+  onClearFilters: () => void
 }
 
 const ProductFilters = ({
@@ -29,7 +30,8 @@ const ProductFilters = ({
   onSearchChange,
   onSortChange,
   priceRange,
-  onPriceRangeChange
+  onPriceRangeChange,
+  onClearFilters
 }: ProductFiltersProps) => {
 
   // Calculate product count per supplier
@@ -70,6 +72,16 @@ const ProductFilters = ({
               </button>
             )}
           </div>
+        </div>
+
+        {/* Clear All Filters Button */}
+        <div className="clear-filters">
+          <button
+            className="btn btn-secondary"
+            onClick={() => onClearFilters()}
+          >
+            Limpiar todos los filtros
+          </button>
         </div>
 
         {/* Category Filters */}
@@ -120,7 +132,9 @@ const ProductFilters = ({
               </button>
             ))}
           </div>
-          <div className="filter-section">
+
+          {/* Price Range Filter */}
+          <div className="filter-price-section">
             <h3 className="filter-title p1-medium">Rango de precios</h3>
             <div className="price-range-slider">
               <input
@@ -140,6 +154,8 @@ const ProductFilters = ({
               </div>
             </div>
           </div>
+
+
         </div>
       </div>
     </div>

@@ -165,6 +165,17 @@
   font-weight: 500;
 }
 
+.filter-price-section {
+  margin-top: 2rem;
+}
+
+.clear-filters {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  margin-right: 1.7rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .filters-card {

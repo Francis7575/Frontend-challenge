@@ -87,6 +87,15 @@ const ProductList = () => {
     filterProducts(selectedCategory, searchQuery, sortBy, selectedSupplier, range)
   }
 
+  const handleClearFilters = () => {
+    setSelectedCategory('all')
+    setSelectedSupplier('')
+    setSearchQuery('')
+    setSortBy('name')
+    setPriceRange({ min: minPrice, max: maxPrice })
+    filterProducts('all', '', 'name', '', { min: minPrice, max: maxPrice })
+  }
+
   return (
     <div className="product-list-page">
       <div className="container">
@@ -123,6 +132,7 @@ const ProductList = () => {
           onSearchChange={handleSearchChange}
           onSortChange={handleSortChange}
           onSupplierChange={handleSupplierChange}
+          onClearFilters={handleClearFilters}
         />
 
         {/* Products Grid */}
