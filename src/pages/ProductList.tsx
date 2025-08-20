@@ -15,53 +15,62 @@ const ProductList = () => {
   const maxPrice = Math.max(...allProducts.map(p => p.basePrice))
   const [priceRange, setPriceRange] = useState({ min: minPrice, max: maxPrice })
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null);
+
   // Filter and sort products based on criteria
   const filterProducts = (category: string, search: string, sort: string, supplier: string, range: { min: number; max: number }) => {
     setLoading(true)
+    setError(null);
     setTimeout(() => {
-      let filtered = [...allProducts]
-      // Category filter
-      if (category !== 'all') {
-        filtered = filtered.filter(product => product.category === category)
+      try {
+        let filtered = [...allProducts]
+        // Category filter
+        if (category !== 'all') {
+          filtered = filtered.filter(product => product.category === category)
+        }
+
+        // Search filter
+        if (search) {
+          const lowerSearch = search.toLowerCase()
+          filtered = filtered.filter(product =>
+            product.name.toLowerCase().includes(lowerSearch) ||
+            product.sku.toLowerCase().includes(lowerSearch)
+          )
+        }
+
+        // Supplier filter
+        if (supplier) {
+          filtered = filtered.filter(product => product.supplier === supplier)
+        }
+
+        // Price range filter
+        filtered = filtered.filter(p => p.basePrice >= range.min && p.basePrice <= range.max)
+
+        // Sorting logic
+        switch (sort) {
+          case 'name':
+            filtered.sort((a, b) => a.name.localeCompare(b.name))
+            break
+          case 'price-asc':
+            filtered.sort((a, b) => a.basePrice - b.basePrice)
+            break
+          case 'price-desc':
+            filtered.sort((a, b) => b.basePrice - a.basePrice)
+            break
+          case 'stock':
+            filtered.sort((a, b) => b.stock - a.stock)
+            break
+          default:
+            break
+        }
+        setFilteredProducts(filtered)
+
+      } catch (err) {
+        console.error(err);
+        setError('Ocurrió un error al filtrar los productos. Intenta nuevamente.');
+      } finally {
+        setLoading(false)
       }
-
-      // Search filter
-      if (search) {
-        const lowerSearch = search.toLowerCase()
-        filtered = filtered.filter(product =>
-          product.name.toLowerCase().includes(lowerSearch) ||
-          product.sku.toLowerCase().includes(lowerSearch)
-        )
-      }
-
-      // Supplier filter
-      if (supplier) {
-        filtered = filtered.filter(product => product.supplier === supplier)
-      }
-
-      // Price range filter
-      filtered = filtered.filter(p => p.basePrice >= range.min && p.basePrice <= range.max)
-
-      // Sorting logic
-      switch (sort) {
-        case 'name':
-          filtered.sort((a, b) => a.name.localeCompare(b.name))
-          break
-        case 'price-asc':
-          filtered.sort((a, b) => a.basePrice - b.basePrice)
-          break
-        case 'price-desc':
-          filtered.sort((a, b) => b.basePrice - a.basePrice)
-          break
-        case 'stock':
-          filtered.sort((a, b) => b.stock - a.stock)
-          break
-        default:
-          break
-      }
-
-      setFilteredProducts(filtered)
-      setLoading(false)
     }, 500)
   }
 
@@ -117,7 +126,9 @@ const ProductList = () => {
               <span className="stat-label l1">productos</span>
             </div>
             <div className="stat-item">
-              <span className="stat-value p1-medium">6</span>
+              <span className="stat-value p1-medium">
+                {Array.from(new Set(allProducts.map(p => p.category))).length}
+              </span>
               <span className="stat-label l1">categorías</span>
             </div>
           </div>
@@ -144,6 +155,17 @@ const ProductList = () => {
             <div className="loading-state">
               <span className="material-icons spin">hourglass_top</span>
               <p>Cargando productos...</p>
+            </div>
+          ) : error ? (
+            <div className="error-state">
+              <span className="material-icons">error_outline</span>
+              <p>{error}</p>
+              <button
+                className="btn btn-primary cta1"
+                onClick={() => filterProducts(selectedCategory, searchQuery, sortBy, selectedSupplier, priceRange)}
+              >
+                Reintentar
+              </button>
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="empty-state">

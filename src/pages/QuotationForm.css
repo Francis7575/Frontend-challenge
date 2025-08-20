@@ -59,6 +59,12 @@ textarea.input-field {
   gap: 2rem;
 }
 
+.error-message {
+  color: #d32f2f;          /* Strong red color for errors */
+  font-size: 0.875rem;     /* Slightly smaller than normal text */
+  margin-top: 0.25rem;     /* Small spacing above the message */
+  font-weight: 500;        /* Medium weight for readability */
+}
 @media (min-width: 600px) {
   .quotation-form {
     padding: 0;

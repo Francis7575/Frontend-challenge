@@ -20,6 +20,7 @@ const QuotationForm = () => {
     product: product ? product.name : '',
     unitPrice: product ? product.basePrice : 0,
   });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -42,7 +43,27 @@ const QuotationForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const newErrors: { [key: string]: string } = {};
+
+    // Validate required fields
+    if (!formData.company?.trim()) newErrors.company = 'Ingrese el nombre de la empresa';
+    if (!formData.contact?.trim()) newErrors.contact = 'Ingrese un contacto';
+    if (!formData.email?.trim()) newErrors.email = 'Ingrese un correo electrónico';
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Correo electrónico inválido';
+    if (!formData.phone?.trim()) newErrors.phone = 'Ingrese un número de teléfono';
+    if (!formData.company?.trim()) newErrors.validity = 'Ingrese fecha de validez';
+
+    // Add any other validations you need
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors); // show errors
+      return; // stop submission
+    }
+
+    setErrors({}); // clear previous errors
     setLoading(true);
+
     setTimeout(() => {
       printQuotation();
       setLoading(false);
@@ -88,8 +109,10 @@ const QuotationForm = () => {
                         min={field.min}
                         max={field.max}
                         readOnly={field.readOnly}
-                        required
                       />
+                    )}
+                    {errors[field.name] && (
+                      <p className="error-message">{errors[field.name]}</p>
                     )}
                   </div>
                 );
@@ -105,8 +128,8 @@ const QuotationForm = () => {
       )}
       <div id="quotation-summary" style={{ display: 'none' }}>
         <h2>Quotation Summary</h2>
-        <p>Empresa: {formData.Empresa}</p>
-        <p>Contacto: {formData.Contacto}</p>
+        <p>Empresa: {formData.company}</p>
+        <p>Contacto: {formData.contact}</p>
         <p>Correo Electronico: {formData.email}</p>
         <p>Numero de telefono: {formData.phone}</p>
         <p>Producto: {formData.product}</p>

@@ -15,25 +15,50 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const { addToCart } = useCart()
   const navigate = useNavigate()
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
       setLoading(true)
+      setError(null);
       setTimeout(() => {
-        const foundProduct = products.find(p => p.id === parseInt(id))
-        setProduct(foundProduct || null)
+        try {
+          const foundProduct = products.find(p => p.id === parseInt(id))
+          setProduct(foundProduct || null)
 
-        // Set default selections
-        if (foundProduct?.colors && foundProduct.colors.length > 0) {
-          setSelectedColor(foundProduct.colors[0])
+          // Set default selections
+          if (foundProduct?.colors && foundProduct.colors.length > 0) {
+            setSelectedColor(foundProduct.colors[0])
+          }
+          if (foundProduct?.sizes && foundProduct.sizes.length > 0) {
+            setSelectedSize(foundProduct.sizes[0])
+          }
+        } catch (err) {
+          console.error(err);
+          setError('Ocurrió un error al cargar el producto');
+          setProduct(null);
+        } finally {
+          setLoading(false)
         }
-        if (foundProduct?.sizes && foundProduct.sizes.length > 0) {
-          setSelectedSize(foundProduct.sizes[0])
-        }
-        setLoading(false)
       }, 500)
     }
   }, [id])
+
+  if (error) {
+    return (
+      <div className="container">
+        <div className="error-state">
+          <span className="material-icons">error_outline</span>
+          <h2 className="h2">¡Ups!</h2>
+          <p className="p1">{error}</p>
+          <button className="btn btn-primary cta1" onClick={() => navigate('/')}>
+            <span className="material-icons">arrow_back</span>
+            Volver al catálogo
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ⏳ Loading state
   if (loading) {
