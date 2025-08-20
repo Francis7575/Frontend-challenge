@@ -1,4 +1,5 @@
 import { categories, products, suppliers } from '../data/products'
+import { formatPrice } from '../utils/utils'
 import './ProductFilters.css'
 
 interface PriceRange {
@@ -44,10 +45,6 @@ const ProductFilters = ({
   const allPrices = products.map(p => p.basePrice)
   const minProductPrice = Math.min(...allPrices)
   const maxProductPrice = Math.max(...allPrices)
-
-  const formatPrice = (price: number) => {
-    return price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
-  }
 
   return (
     <div className="product-filters">
@@ -154,8 +151,6 @@ const ProductFilters = ({
               </div>
             </div>
           </div>
-
-
         </div>
       </div>
     </div>

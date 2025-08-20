@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { products } from '../data/products'
 import { Product } from '../types/Product'
 import PricingCalculator from '../components/PricingCalculator'
@@ -13,6 +13,7 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<string>('')
   const [quantity, setQuantity] = useState<number>(1)
   const { addToCart } = useCart()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (id) {
@@ -196,7 +197,7 @@ const ProductDetail = () => {
 
                 <button
                   className="btn btn-secondary cta1"
-                  onClick={() => alert('Función de cotización por implementar')}
+                  onClick={() => navigate(`/quotation-form/${product.id}`)}
                 >
                   <span className="material-icons">calculate</span>
                   Solicitar cotización

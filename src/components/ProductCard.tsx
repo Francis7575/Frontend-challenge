@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Product } from '../types/Product'
 import './ProductCard.css'
+import { formatPrice } from '../utils/utils'
 
 interface ProductCardProps {
   product: Product
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const navigate = useNavigate()
+  
   // Handle product status display
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -21,10 +24,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
   }
 
-  // Format price for display
-   const formatPrice = (price: number) => {
-    return price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
-  }
 
   // Check stock availability
   const getStockStatus = (stock: number) => {
@@ -120,7 +119,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className="btn btn-secondary l1"
             onClick={(e) => {
               e.preventDefault()
-              alert('Función de cotización por implementar')
+              navigate(`/quotation-form/${product.id}`)
             }}
           >
             <span className="material-icons">calculate</span>

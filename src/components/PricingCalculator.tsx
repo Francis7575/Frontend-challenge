@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Product } from '../types/Product'
 import './PricingCalculator.css'
+import { formatPrice } from '../utils/utils'
 
 interface PricingCalculatorProps {
   product: Product
@@ -33,23 +34,19 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
 
   // Calculate discount amount
   const getDiscount = (qty: number) => {
-    const totalBase = product.basePrice * qty
-    const totalDiscounted = calculatePrice(qty)
+    if (!product.priceBreaks || product.priceBreaks.length === 0) return 0
 
-    if (totalBase === 0) return 0
+    const applicableBreak = product.priceBreaks
+      .filter(b => qty >= b.minQty)
+      .reduce((best, curr) => curr.price < best.price ? curr : best, product.priceBreaks[0])
 
-    return ((totalBase - totalDiscounted) / totalBase) * 100
-  }
-
-
-  // Format price display
-  const formatPrice = (price: number) => {
-    return price.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })
+    return applicableBreak.discount ?? 0
   }
 
   const currentPrice = Math.round(calculatePrice(quantity))
   const discountPercent = getDiscount(quantity)
   const MAX_QUANTITY = 10000;
+  const totalPrice = currentPrice - discountPercent / 100 * currentPrice
 
   return (
     <div className="pricing-calculator">
@@ -142,7 +139,7 @@ const PricingCalculator = ({ product }: PricingCalculatorProps) => {
           <div className="summary-row total-row">
             <span className="summary-label p1-medium">Total:</span>
             <span className="summary-value total-value h2">
-              {formatPrice(currentPrice)}
+              {formatPrice(totalPrice)}
             </span>
           </div>
         </div>
