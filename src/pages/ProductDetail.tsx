@@ -11,24 +11,41 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null)
   const [selectedColor, setSelectedColor] = useState<string>('')
   const [selectedSize, setSelectedSize] = useState<string>('')
+  const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState<number>(1)
   const { addToCart } = useCart()
   const navigate = useNavigate()
 
   useEffect(() => {
     if (id) {
-      const foundProduct = products.find(p => p.id === parseInt(id))
-      setProduct(foundProduct || null)
+      setLoading(true)
+      setTimeout(() => {
+        const foundProduct = products.find(p => p.id === parseInt(id))
+        setProduct(foundProduct || null)
 
-      // Set default selections
-      if (foundProduct?.colors && foundProduct.colors.length > 0) {
-        setSelectedColor(foundProduct.colors[0])
-      }
-      if (foundProduct?.sizes && foundProduct.sizes.length > 0) {
-        setSelectedSize(foundProduct.sizes[0])
-      }
+        // Set default selections
+        if (foundProduct?.colors && foundProduct.colors.length > 0) {
+          setSelectedColor(foundProduct.colors[0])
+        }
+        if (foundProduct?.sizes && foundProduct.sizes.length > 0) {
+          setSelectedSize(foundProduct.sizes[0])
+        }
+        setLoading(false)
+      }, 500)
     }
   }, [id])
+
+  // ⏳ Loading state
+  if (loading) {
+    return (
+      <div className="container">
+        <div className="loading-state">
+          <span className="material-icons spin">hourglass_top</span>
+          <p className="p1">Cargando producto...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Handle loading state
   if (!product) {

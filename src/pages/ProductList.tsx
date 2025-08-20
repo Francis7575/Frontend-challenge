@@ -14,52 +14,55 @@ const ProductList = () => {
   const minPrice = Math.min(...allProducts.map(p => p.basePrice))
   const maxPrice = Math.max(...allProducts.map(p => p.basePrice))
   const [priceRange, setPriceRange] = useState({ min: minPrice, max: maxPrice })
-
+  const [loading, setLoading] = useState(false)
   // Filter and sort products based on criteria
   const filterProducts = (category: string, search: string, sort: string, supplier: string, range: { min: number; max: number }) => {
-    let filtered = [...allProducts]
+    setLoading(true)
+    setTimeout(() => {
+      let filtered = [...allProducts]
+      // Category filter
+      if (category !== 'all') {
+        filtered = filtered.filter(product => product.category === category)
+      }
 
-    // Category filter
-    if (category !== 'all') {
-      filtered = filtered.filter(product => product.category === category)
-    }
+      // Search filter
+      if (search) {
+        const lowerSearch = search.toLowerCase()
+        filtered = filtered.filter(product =>
+          product.name.toLowerCase().includes(lowerSearch) ||
+          product.sku.toLowerCase().includes(lowerSearch)
+        )
+      }
 
-    // Search filter
-    if (search) {
-      const lowerSearch = search.toLowerCase()
-      filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(lowerSearch) ||
-        product.sku.toLowerCase().includes(lowerSearch)
-      )
-    }
+      // Supplier filter
+      if (supplier) {
+        filtered = filtered.filter(product => product.supplier === supplier)
+      }
 
-    // Supplier filter
-    if (supplier) {
-      filtered = filtered.filter(product => product.supplier === supplier)
-    }
+      // Price range filter
+      filtered = filtered.filter(p => p.basePrice >= range.min && p.basePrice <= range.max)
 
-    // Price range filter
-    filtered = filtered.filter(p => p.basePrice >= range.min && p.basePrice <= range.max)
+      // Sorting logic
+      switch (sort) {
+        case 'name':
+          filtered.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'price-asc':
+          filtered.sort((a, b) => a.basePrice - b.basePrice)
+          break
+        case 'price-desc':
+          filtered.sort((a, b) => b.basePrice - a.basePrice)
+          break
+        case 'stock':
+          filtered.sort((a, b) => b.stock - a.stock)
+          break
+        default:
+          break
+      }
 
-    // Sorting logic
-    switch (sort) {
-      case 'name':
-        filtered.sort((a, b) => a.name.localeCompare(b.name))
-        break
-      case 'price-asc':
-        filtered.sort((a, b) => a.basePrice - b.basePrice)
-        break
-      case 'price-desc':
-        filtered.sort((a, b) => b.basePrice - a.basePrice)
-        break
-      case 'stock':
-        filtered.sort((a, b) => b.stock - a.stock)
-        break
-      default:
-        break
-    }
-
-    setFilteredProducts(filtered)
+      setFilteredProducts(filtered)
+      setLoading(false)
+    }, 500)
   }
 
   const handleCategoryChange = (category: string) => {
@@ -137,7 +140,12 @@ const ProductList = () => {
 
         {/* Products Grid */}
         <div className="products-section">
-          {filteredProducts.length === 0 ? (
+          {loading ? (
+            <div className="loading-state">
+              <span className="material-icons spin">hourglass_top</span>
+              <p>Cargando productos...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="empty-state">
               <span className="material-icons">search_off</span>
               <h3 className="h2">No hay productos</h3>

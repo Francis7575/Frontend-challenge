@@ -85,6 +85,10 @@
   margin-bottom: 24px;
 }
 
+.loading-state {
+  display: flex;
+  justify-content: center;
+}
 /* Responsive */
 @media (max-width: 768px) {
   .page-header {
